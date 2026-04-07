@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next Chapter Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p: #8B5CF6;
+  --p2: #7C3AED;
+  --p3: #6D28D9;
+  --accent: #C4B5FD;
+  --dark: #0C0A14;
+  --dark2: #100D1E;
+  --dark3: #1A1535;
+  --text: #F8F6FF;
+  --muted: rgba(196,181,253,0.55);
+  --border: rgba(139,92,246,0.18);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--dark);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CUSTOM CURSOR ── */
+#cursor{
+  position:fixed;width:12px;height:12px;
+  background:#8B5CF6;border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transition:transform 0.15s ease;
+  opacity:0;
+  box-shadow:0 0 8px rgba(139,92,246,0.9);
+}
+#cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1.5px solid rgba(139,92,246,0.6);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transition:width 0.3s,height 0.3s,border-color 0.3s;
+  opacity:0;
+}
+
+/* ── PARTICLE BG ── */
+#particle-canvas{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;z-index:2;
+  opacity:1;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:0 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  height:72px;
+  background:rgba(12,10,20,0.7);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transition:all 0.3s;
+}
+nav.scrolled{background:rgba(12,10,20,0.95);}
+
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Syne',sans-serif;
+  text-decoration:none;
+}
+.nav-logo-icon{
+  width:36px;height:36px;
+  background:var(--p);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;color:#fff;
+  font-family:'Syne',sans-serif;
+}
+.nav-logo-text{display:flex;flex-direction:column;line-height:1.1;}
+.nav-logo-text span:first-child{font-size:15px;font-weight:700;color:#fff;letter-spacing:0.5px;}
+.nav-logo-text span:last-child{font-size:9px;font-weight:400;color:var(--accent);letter-spacing:2px;text-transform:uppercase;}
+
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{
+  font-size:13px;font-weight:500;
+  color:var(--muted);text-decoration:none;
+  letter-spacing:0.5px;
+  transition:color 0.2s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;
+  width:0;height:1px;background:var(--p);
+  transition:width 0.3s;
+}
+.nav-links a:hover{color:#fff;}
+.nav-links a:hover::after{width:100%;}
+
+.nav-cta{
+  background:var(--p);color:#fff;
+  border:none;padding:10px 22px;
+  border-radius:8px;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:500;cursor:none;
+  transition:all 0.3s;
+  position:relative;overflow:hidden;
+}
+.nav-cta::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0.1);
+  transform:translateX(-100%);transition:transform 0.3s;
+}
+.nav-cta:hover::before{transform:translateX(0);}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(139,92,246,0.4);}
+
+/* ── PAGES ── */
+.page{min-height:100vh;position:relative;z-index:3;display:none;background:transparent;}
+.page.active{display:block;}
+#home{display:block;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:120px 5% 80px;
+  position:relative;
+  overflow:hidden;
+  background:transparent;
+}
+
+.hero-glow{
+  position:absolute;
+  width:700px;height:700px;
+  background:radial-gradient(circle,rgba(139,92,246,0.15) 0%,transparent 70%);
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  animation:pulse-glow 4s ease-in-out infinite;
+}
+@keyframes pulse-glow{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6;}
+  50%{transform:translate(-50%,-50%) scale(1.15);opacity:1;}
+}
+
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(139,92,246,0.12);
+  border:1px solid rgba(139,92,246,0.3);
+  border-radius:20px;padding:6px 16px;
+  font-size:11px;font-weight:500;
+  color:var(--accent);letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:32px;
+  animation:fadeUp 0.8s ease both;
+}
+.hero-tag-dot{
+  width:6px;height:6px;
+  background:var(--p);border-radius:50%;
+  animation:blink 1.5s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;};}
+
+.hero-h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(72px,11vw,140px);
+  font-weight:400;line-height:0.95;
+  letter-spacing:3px;
+  margin-bottom:24px;
+  animation:fadeUp 0.8s ease 0.1s both;
+}
+.hero-h1 .line1{color:#fff;display:block;}
+.hero-h1 .line2{
+  background:linear-gradient(135deg,#DDD6FE 0%,#8B5CF6 45%,#6D28D9 80%,#A78BFA 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;display:block;
+  filter:drop-shadow(0 0 30px rgba(139,92,246,0.5));
+}
+
+.hero-sub{
+  font-size:clamp(15px,1.8vw,18px);
+  color:var(--muted);max-width:580px;
+  line-height:1.7;margin:0 auto 48px;
+  font-weight:300;
+  animation:fadeUp 0.8s ease 0.2s both;
+}
+
+.hero-btns{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp 0.8s ease 0.3s both;
+}
+
+.btn-primary{
+  background:var(--p);color:#fff;
+  border:none;padding:14px 32px;
+  border-radius:10px;font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;cursor:none;
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.btn-primary::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 32px rgba(139,92,246,0.5);
+}
+.btn-primary:hover::before{opacity:1;}
+
+.btn-ghost{
+  background:transparent;color:#fff;
+  border:1px solid rgba(255,255,255,0.15);
+  padding:14px 32px;border-radius:10px;
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;cursor:none;
+  transition:all 0.3s;
+  backdrop-filter:blur(8px);
+}
+.btn-ghost:hover{
+  border-color:var(--p);color:var(--accent);
+  background:rgba(139,92,246,0.08);
+  transform:translateY(-2px);
+}
+
+/* ── STATS STRIP ── */
+.stats-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--border);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  margin-top:80px;
+  position:relative;z-index:4;
+}
+.stat-item{
+  background:rgba(16,13,30,0.95);
+  padding:32px 20px;text-align:center;
+  transition:background 0.3s;
+  position:relative;overflow:hidden;
+}
+.stat-item::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 100%,rgba(139,92,246,0.1),transparent 70%);
+  opacity:0;transition:opacity 0.4s;
+}
+.stat-item:hover{background:rgba(139,92,246,0.06);}
+.stat-item:hover::before{opacity:1;}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;font-weight:400;
+  background:linear-gradient(135deg,#fff,var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;letter-spacing:2px;
+}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:0.5px;}
+
+/* ── SECTION COMMONS ── */
+section{padding:100px 5%;position:relative;background:transparent;}
+.section-eyebrow{
+  font-size:10px;font-weight:600;
+  color:var(--p);letter-spacing:3px;
+  text-transform:uppercase;margin-bottom:12px;
+}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(42px,5vw,72px);
+  font-weight:400;line-height:1.0;
+  letter-spacing:2px;margin-bottom:16px;
+}
+.section-sub{
+  font-size:16px;color:var(--muted);
+  max-width:520px;line-height:1.7;font-weight:300;
+}
+
+/* ── SERVICES GRID (home preview) ── */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:2px;background:rgba(139,92,246,0.3);
+  border:1px solid rgba(139,92,246,0.4);
+  border-radius:16px;overflow:hidden;
+  margin-top:56px;
+  box-shadow:0 0 60px rgba(139,92,246,0.15),0 0 120px rgba(139,92,246,0.06);
+}
+.service-card{
+  background:rgba(16,13,30,0.97);
+  padding:36px 32px;
+  position:relative;overflow:hidden;
+  transition:background 0.4s;
+  cursor:none;
+  border-bottom:1px solid rgba(139,92,246,0.15);
+}
+.service-card::before{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--p),transparent);
+  transform:scaleX(0);transition:transform 0.4s;
+}
+.service-card:hover{background:rgba(139,92,246,0.1);}
+.service-card:hover::before{transform:scaleX(1);}
+
+/* animated border on hover */
+.service-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(139,92,246,0.14),transparent 60%);
+  opacity:0;transition:opacity 0.4s;pointer-events:none;
+}
+.service-card:hover::after{opacity:1;}
+
+.service-icon{
+  width:48px;height:48px;
+  background:rgba(139,92,246,0.18);
+  border:1px solid rgba(139,92,246,0.35);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;
+  transition:all 0.3s;
+  box-shadow:0 0 16px rgba(139,92,246,0.2);
+}
+.service-card:hover .service-icon{
+  background:rgba(139,92,246,0.3);
+  border-color:rgba(139,92,246,0.6);
+  transform:scale(1.05);
+  box-shadow:0 0 24px rgba(139,92,246,0.4);
+}
+.service-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:26px;font-weight:400;
+  margin-bottom:10px;color:#fff;letter-spacing:1px;
+}
+.service-desc{font-size:13.5px;color:rgba(196,181,253,0.75);line-height:1.7;}
+.service-price{
+  margin-top:16px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:36px;font-weight:400;
+  color:var(--p);letter-spacing:1px;
+  text-shadow:0 0 20px rgba(139,92,246,0.5);
+}
+.service-price span{font-size:12px;font-weight:400;color:var(--muted);}
+
+/* ── MOVING BORDER CARD ── */
+.glow-card{
+  position:relative;
+  border-radius:16px;overflow:hidden;
+}
+.glow-card::before{
+  content:'';
+  position:absolute;inset:-2px;
+  background:conic-gradient(from var(--angle,0deg),transparent 30%,var(--p) 50%,transparent 70%);
+  border-radius:18px;
+  animation:spin-border 4s linear infinite;
+  opacity:0;transition:opacity 0.4s;
+}
+.glow-card:hover::before{opacity:1;}
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false;}
+@keyframes spin-border{to{--angle:360deg;}}
+.glow-card-inner{
+  position:relative;z-index:1;
+  background:var(--dark2);border-radius:14px;
+  padding:40px;margin:2px;
+}
+
+/* ── PRICING SECTION ── */
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;margin-top:56px;
+}
+@media(max-width:800px){.pricing-grid{grid-template-columns:1fr;}}
+
+.pricing-card{
+  background:rgba(16,13,30,0.97);
+  border:1px solid rgba(139,92,246,0.3);
+  border-radius:16px;padding:36px 28px;
+  position:relative;overflow:hidden;
+  transition:all 0.4s;cursor:none;
+  box-shadow:0 0 30px rgba(139,92,246,0.08);
+}
+.pricing-card.popular{
+  border-color:var(--p);
+  background:linear-gradient(135deg,rgba(16,13,30,0.97),rgba(139,92,246,0.12));
+  box-shadow:0 0 60px rgba(139,92,246,0.25);
+}
+.pricing-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(139,92,246,0.14),transparent 65%);
+  opacity:0;transition:opacity 0.4s;pointer-events:none;
+}
+.pricing-card:hover::before{opacity:1;}
+.pricing-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(139,92,246,0.2);}
+.pricing-card.popular:hover{box-shadow:0 20px 80px rgba(139,92,246,0.4);}
+
+.pop-badge{
+  position:absolute;top:0;right:24px;
+  background:var(--p);color:#fff;
+  font-size:10px;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;padding:5px 14px;
+  border-radius:0 0 10px 10px;
+}
+.pc-name{
+  font-family:'Syne',sans-serif;
+  font-size:20px;font-weight:700;margin-bottom:8px;
+}
+.pc-desc{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+.pc-price{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:56px;font-weight:400;
+  background:linear-gradient(135deg,#fff,var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1;letter-spacing:2px;
+}
+.pc-price sub{font-size:16px;vertical-align:super;}
+.pc-period{font-size:12px;color:var(--muted);margin-bottom:28px;margin-top:4px;}
+.pc-divider{
+  height:1px;background:var(--border);margin-bottom:24px;
+}
+.pc-features{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.pc-features li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13.5px;color:rgba(196,181,253,0.8);
+}
+.pc-features li::before{
+  content:'';
+  width:16px;height:16px;flex-shrink:0;
+  background:rgba(139,92,246,0.15);
+  border:1px solid rgba(139,92,246,0.3);
+  border-radius:50%;margin-top:1px;
+  background-image:url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3L3 5L7 1' stroke='%238B5CF6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:center;
+}
+
+/* ── PROCESS ── */
+.process-steps{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;margin-top:56px;position:relative;
+}
+.process-steps::before{
+  content:'';position:absolute;
+  top:40px;left:12.5%;right:12.5%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--p),transparent);
+}
+.process-step{text-align:center;padding:0 16px;}
+.step-num{
+  width:80px;height:80px;
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:800;
+  color:var(--p);
+  transition:all 0.4s;position:relative;z-index:1;
+}
+.process-step:hover .step-num{
+  background:var(--p);color:#fff;
+  box-shadow:0 0 30px rgba(139,92,246,0.5);
+  transform:scale(1.05);
+}
+.step-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* ── TESTIMONIAL / PROOF ── */
+.proof-strip{
+  background:linear-gradient(135deg,rgba(139,92,246,0.06),rgba(109,40,217,0.08));
+  border:1px solid var(--border);
+  border-radius:20px;padding:56px;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:48px;align-items:center;
+  margin-top:80px;
+  position:relative;overflow:hidden;
+}
+.proof-strip::before{
+  content:'';position:absolute;
+  top:-100px;right:-100px;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(139,92,246,0.15),transparent 70%);
+  pointer-events:none;
+}
+
+/* ── WHO WE HELP ── */
+.targets-grid{
+  display:flex;flex-wrap:wrap;gap:10px;
+  margin-top:40px;
+}
+.target-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:100px;padding:10px 20px;
+  font-size:13px;color:rgba(196,181,253,0.8);
+  transition:all 0.3s;cursor:none;
+}
+.target-pill:hover{
+  background:rgba(139,92,246,0.1);
+  border-color:var(--p);color:#fff;
+  transform:translateY(-2px);
+}
+.target-pill-dot{
+  width:6px;height:6px;
+  background:var(--p);border-radius:50%;
+}
+
+/* ── ABOUT PAGE ── */
+.founders-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:24px;margin-top:56px;
+}
+.founder-card{
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:20px;overflow:hidden;
+  transition:all 0.4s;cursor:none;
+  position:relative;
+}
+.founder-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(139,92,246,0.08),transparent 60%);
+  opacity:0;transition:opacity 0.4s;pointer-events:none;z-index:0;
+}
+.founder-card:hover::before{opacity:1;}
+.founder-card:hover{transform:translateY(-4px);border-color:rgba(139,92,246,0.4);}
+
+.founder-img-area{
+  height:220px;
+  background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(109,40,217,0.3));
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.founder-img-area img{
+  width:100%;height:100%;object-fit:cover;object-position:top;
+  display:block;
+}
+.founder-img-placeholder{
+  font-family:'Syne',sans-serif;
+  font-size:56px;font-weight:800;
+  color:rgba(139,92,246,0.4);
+}
+.founder-body{padding:28px;position:relative;z-index:1;}
+.founder-name{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:700;margin-bottom:4px;
+}
+.founder-role{
+  font-size:12px;font-weight:500;
+  color:var(--p);letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:16px;
+}
+.founder-bio{font-size:14px;color:var(--muted);line-height:1.7;}
+
+/* ── VALUES ── */
+.values-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:16px;margin-top:48px;
+}
+.value-item{
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:14px;padding:28px;
+  transition:all 0.3s;cursor:none;
+}
+.value-item:hover{
+  border-color:rgba(139,92,246,0.35);
+  background:rgba(139,92,246,0.05);
+  transform:translateY(-2px);
+}
+.value-icon{
+  width:40px;height:40px;
+  background:rgba(139,92,246,0.1);
+  border-radius:10px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.value-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;}
+.value-desc{font-size:13.5px;color:var(--muted);line-height:1.6;}
+
+/* ── CONTACT ── */
+.contact-grid{
+  display:grid;grid-template-columns:1fr 1.2fr;
+  gap:48px;align-items:start;margin-top:56px;
+}
+.contact-info{display:flex;flex-direction:column;gap:20px;}
+.contact-info-card{
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:14px;padding:24px;
+  display:flex;gap:16px;align-items:flex-start;
+  transition:all 0.3s;
+}
+.contact-info-card:hover{border-color:rgba(139,92,246,0.35);}
+.ci-icon{
+  width:40px;height:40px;flex-shrink:0;
+  background:rgba(139,92,246,0.1);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.ci-label{font-size:11px;color:var(--p);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.ci-value{font-size:14px;color:#fff;font-weight:500;}
+.ci-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+.contact-form{
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:20px;padding:40px;
+  position:relative;overflow:hidden;
+}
+.contact-form::before{
+  content:'';position:absolute;
+  top:-80px;right:-80px;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(139,92,246,0.1),transparent 70%);
+  pointer-events:none;
+}
+.form-title{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:700;margin-bottom:6px;
+}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.form-label{font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;}
+.form-input,.form-select,.form-textarea{
+  background:rgba(139,92,246,0.06);
+  border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;
+  color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:14px;outline:none;width:100%;
+  transition:all 0.3s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--p);
+  background:rgba(139,92,246,0.1);
+  box-shadow:0 0 0 3px rgba(139,92,246,0.1);
+}
+.form-select{cursor:none;appearance:none;}
+.form-textarea{resize:vertical;min-height:100px;}
+.form-submit{
+  width:100%;background:var(--p);color:#fff;
+  border:none;padding:14px;border-radius:10px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  font-weight:500;cursor:none;transition:all 0.3s;
+  margin-top:4px;position:relative;overflow:hidden;
+}
+.form-submit::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.form-submit:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 32px rgba(139,92,246,0.5);
+}
+.form-submit:hover::before{opacity:1;}
+
+/* ── CTA SECTION ── */
+.cta-section{
+  padding:100px 5%;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(139,92,246,0.12),transparent 70%);
+  pointer-events:none;
+}
+.cta-section .section-title{margin:0 auto 16px;}
+.cta-section .section-sub{margin:0 auto 40px;}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--dark2);
+  border-top:1px solid var(--border);
+  padding:40px 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-left{
+  display:flex;align-items:center;gap:12px;
+}
+.footer-logo-mark{
+  width:32px;height:32px;
+  background:var(--p);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:13px;color:#fff;
+}
+.footer-name{
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+}
+.footer-sub{font-size:11px;color:var(--muted);}
+.footer-right{font-size:12px;color:var(--muted);}
+.footer-links{display:flex;gap:24px;margin-bottom:4px;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:12px;transition:color 0.2s;}
+.footer-links a:hover{color:var(--accent);}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.fade-up.visible{opacity:1;transform:translateY(0);}
+
+/* ── PAGE TRANSITIONS ── */
+.page{animation:pageIn 0.5s ease both;}
+@keyframes pageIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--dark);}
+::-webkit-scrollbar-thumb{background:var(--p);border-radius:2px;}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .nav-links{display:none;}
+  .stats-strip{grid-template-columns:repeat(2,1fr);}
+  .process-steps{grid-template-columns:repeat(2,1fr);}
+  .process-steps::before{display:none;}
+  .founders-grid,.contact-grid,.proof-strip{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .values-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Particle Canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#" onclick="showPage('home')" style="display:flex;align-items:center;height:72px;text-decoration:none;">
+    <svg height="46" viewBox="0 0 320 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="nlg" x1="0" y1="0" x2="320" y2="130" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#DDD6FE"/><stop offset="50%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#6D28D9"/>
+        </linearGradient>
+      </defs>
+      <g transform="translate(0,8) scale(0.6)">
+        <path d="M5 4 L54 4 L54 70 L40 70 L40 84 L5 84 Z" stroke="url(#nlg)" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+        <path d="M40 70 Q52 73 55 80 Q57 86 40 84" stroke="#A78BFA" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <line x1="12" y1="22" x2="47" y2="22" stroke="rgba(196,181,253,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="12" y1="33" x2="47" y2="33" stroke="rgba(196,181,253,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="12" y1="44" x2="47" y2="44" stroke="rgba(196,181,253,0.12)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="5" cy="4" r="2.5" fill="#8B5CF6" opacity="0.9"/>
+      </g>
+      <text x="40" y="58" font-family="Bebas Neue,sans-serif" font-size="54" fill="white" letter-spacing="3">NEXT</text>
+      <text x="40" y="108" font-family="Bebas Neue,sans-serif" font-size="54" fill="url(#nlg)" letter-spacing="3">CHAPTER</text>
+      <text x="40" y="126" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(196,181,253,0.5)" letter-spacing="6">AUTOMATION</text>
+    </svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home')">Home</a></li>
+    <li><a href="#" onclick="showPage('services')">Services</a></li>
+    <li><a href="#" onclick="showPage('about')">About</a></li>
+    <li><a href="#" onclick="showPage('contact')">Contact</a></li>
+  </ul>
+  <button class="nav-cta" onclick="showPage('contact')">Book a Call</button>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HOME PAGE
+════════════════════════════════════════ -->
+<div class="page active" id="home">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-tag">
+      <div class="hero-tag-dot"></div>
+      AI Automation Agency
+    </div>
+    <h1 class="hero-h1">
+      <span class="line1">Stop losing leads.</span>
+      <span class="line2">Start closing deals.</span>
+    </h1>
+    <p class="hero-sub">We build complete AI automation systems — websites, CRM, follow-up sequences, and AI agents — so your business captures every lead and converts more customers on autopilot.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="showPage('services')">See Our Packages</button>
+      <button class="btn-ghost" onclick="showPage('contact')">Book Free Call →</button>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-num">Done</div>
+      <div class="stat-label">For You — We Build Everything</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">No</div>
+      <div class="stat-label">Contracts or Hidden Fees</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">Real</div>
+      <div class="stat-label">Results from Week One</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">AI</div>
+      <div class="stat-label">Powered — Never Sleeps</div>
+    </div>
+  </div>
+
+  <!-- Services Preview -->
+  <section>
+    <div class="section-eyebrow">What We Do</div>
+    <div class="section-title">Everything your business needs<br>to grow on autopilot</div>
+    <div class="section-sub">From your first website to a full AI system — we build, deploy, and manage it all.</div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px;">
+      <div class="service-card" onmousemove="cardMouse(this,event)" onclick="showPage('services')" style="padding:28px 24px;">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="3" width="18" height="16" rx="3" stroke="#8B5CF6" stroke-width="1.8"/><path d="M2 8h18" stroke="#8B5CF6" stroke-width="1.8"/><circle cx="6" cy="5.5" r="1" fill="#8B5CF6"/><circle cx="9" cy="5.5" r="1" fill="#8B5CF6"/></svg>
+        </div>
+        <div class="service-title">Starter</div>
+        <div class="service-desc">Website, CRM, lead capture &amp; automated follow-up. Everything to launch.</div>
+        <div class="service-price">$197<span>/mo</span></div>
+        <div style="margin-top:8px;font-size:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:5px;padding:4px 10px;display:inline-block;color:rgba(255,255,255,0.75);">+ $99 one-time setup fee</div>
+        <div style="margin-top:14px;font-size:11px;color:var(--p);letter-spacing:1px;">View details →</div>
+      </div>
+      <div class="service-card" onmousemove="cardMouse(this,event)" onclick="showPage('services')" style="padding:28px 24px;border-color:var(--p);background:linear-gradient(135deg,var(--dark2),rgba(139,92,246,0.06));position:relative;">
+        <div style="position:absolute;top:0;right:20px;background:var(--p);color:#fff;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:0 0 8px 8px;">Most Popular</div>
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 4C4 4 3 4 3 5C3 6 3 9 6 12C9 15 12 15 13 15C14 15 14 14 14 14L15.5 12.5L13.5 10.5L12.5 11.5C11 10 10 9 10 9L11 8L9 6L7.5 7.5C6 5.5 5 4 4 4Z" stroke="#8B5CF6" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M14 8L18 4M16 4H18V6" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="service-title">Growth</div>
+        <div class="service-desc">Full website, advanced automations, email campaigns &amp; reputation management.</div>
+        <div class="service-price">$397<span>/mo</span></div>
+        <div style="margin-top:8px;font-size:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:5px;padding:4px 10px;display:inline-block;color:rgba(255,255,255,0.75);">+ $99 one-time setup fee</div>
+        <div style="margin-top:14px;font-size:11px;color:var(--p);letter-spacing:1px;">View details →</div>
+      </div>
+      <div class="service-card" onmousemove="cardMouse(this,event)" onclick="showPage('services')" style="padding:28px 24px;">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#8B5CF6" stroke-width="1.8"/><path d="M11 7v4l3 3" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="service-title">Scale</div>
+        <div class="service-desc">AI phone agent, live chat AI, Make.com integrations &amp; full CRM buildout.</div>
+        <div class="service-price">$997<span>/mo</span></div>
+        <div style="margin-top:8px;font-size:11px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.4);border-radius:5px;padding:4px 10px;display:inline-block;"><span style="text-decoration:line-through;color:rgba(255,255,255,0.4);">$99 setup fee</span> <span style="color:#8B5CF6;font-weight:700;">✓ Included</span></div>
+        <div style="margin-top:14px;font-size:11px;color:var(--p);letter-spacing:1px;">View details →</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:28px;">
+      <button class="btn-ghost" onclick="showPage('services')">See full package details →</button>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section style="background:rgba(16,13,30,0.92);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div style="text-align:center;margin-bottom:0;">
+      <div class="section-eyebrow" style="text-align:center;">The Process</div>
+      <div class="section-title" style="text-align:center;">Up and running in days,<br>not months</div>
+    </div>
+    <div class="process-steps">
+      <div class="process-step fade-up">
+        <div class="step-num">01</div>
+        <div class="step-title">Discovery Call</div>
+        <div class="step-desc">We learn your business, goals, and gaps in a free 30-minute call.</div>
+      </div>
+      <div class="process-step fade-up" style="transition-delay:0.1s">
+        <div class="step-num">02</div>
+        <div class="step-title">Custom Build</div>
+        <div class="step-desc">We build your complete system — website, CRM, automations, all configured.</div>
+      </div>
+      <div class="process-step fade-up" style="transition-delay:0.2s">
+        <div class="step-num">03</div>
+        <div class="step-title">Go Live</div>
+        <div class="step-desc">Your system launches and immediately starts capturing and following up leads.</div>
+      </div>
+      <div class="process-step fade-up" style="transition-delay:0.3s">
+        <div class="step-num">04</div>
+        <div class="step-title">Grow & Optimize</div>
+        <div class="step-desc">Monthly reviews, reporting, and improvements to keep you ahead.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who we help -->
+  <section>
+    <div class="section-eyebrow">Who We Serve</div>
+    <div class="section-title">Built for businesses<br>that are ready to grow</div>
+    <div class="targets-grid">
+      <div class="target-pill"><div class="target-pill-dot"></div>Auto Dealerships</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Restaurants & Cafes</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Real Estate Agents</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Contractors</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Salons & Spas</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Healthcare Clinics</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Retail Shops</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Solo Operators</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Law Offices</div>
+      <div class="target-pill"><div class="target-pill-dot"></div>Fitness Studios</div>
+      <div class="target-pill" style="background:rgba(139,92,246,0.1);border-color:var(--p);"><div class="target-pill-dot"></div>& Many More</div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-bg"></div>
+    <div class="section-eyebrow" style="text-align:center;">Get Started</div>
+    <div class="section-title" style="text-align:center;max-width:600px;margin-left:auto;margin-right:auto;">Ready to automate<br>your business?</div>
+    <div class="section-sub" style="text-align:center;margin:0 auto 40px;">Book a free 30-minute discovery call. No contracts. No pressure. Just results.</div>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="showPage('contact')">Book Free Discovery Call</button>
+      <button class="btn-ghost" onclick="showPage('services')">View Pricing →</button>
+    </div>
+    <div style="margin-top:20px;font-size:13px;color:var(--muted);">(715) 587-6649 · nextchapterautomation.com</div>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <svg height="28" viewBox="0 0 200 88" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="flg" x1="0" y1="0" x2="200" y2="88" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#DDD6FE"/><stop offset="50%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#6D28D9"/></linearGradient></defs><g transform="translate(0,6) scale(0.38)"><path d="M5 4 L54 4 L54 70 L40 70 L40 84 L5 84 Z" stroke="url(#flg)" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M40 70 Q52 73 55 80 Q57 86 40 84" stroke="#A78BFA" stroke-width="2" fill="none" stroke-linecap="round"/><line x1="12" y1="22" x2="47" y2="22" stroke="rgba(196,181,253,0.3)" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="33" x2="47" y2="33" stroke="rgba(196,181,253,0.2)" stroke-width="1.5" stroke-linecap="round"/></g><text x="26" y="38" font-family="Bebas Neue,sans-serif" font-size="36" fill="white" letter-spacing="2">NEXT</text><text x="26" y="72" font-family="Bebas Neue,sans-serif" font-size="36" fill="url(#flg)" letter-spacing="2">CHAPTER</text></svg>
+      <div>
+        <div class="footer-name">Next Chapter Automation</div>
+        <div class="footer-sub">nextchapterautomation@gmail.com</div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('services')">Services</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+      <div>© 2025 Next Chapter Automation LLC · All rights reserved</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════
+     SERVICES PAGE
+════════════════════════════════════════ -->
+<div class="page" id="services">
+
+  <section style="padding-top:140px;text-align:center;">
+    <div class="section-eyebrow">Pricing & Packages</div>
+    <div class="section-title">Simple, honest pricing.<br>No hidden fees.</div>
+    <div class="section-sub" style="margin:0 auto;">Pick the package that fits your business. Upgrade anytime.</div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="pricing-grid">
+      <div class="pricing-card" onmousemove="cardMouse(this,event)">
+        <div class="pc-name">Starter</div>
+        <div class="pc-desc">Perfect for businesses that need a professional online presence and smart automation to start capturing leads.</div>
+        <div class="pc-price"><sub>$</sub>197</div>
+        <div class="pc-period">per month</div>
+        <div style="font-size:12px;margin-bottom:28px;margin-top:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 12px;display:inline-block;color:rgba(255,255,255,0.8);">+ $99 one-time setup fee</div>
+        <div class="pc-divider"></div>
+        <ul class="pc-features">
+          <li>Website up to 3 pages</li>
+          <li>Lead capture form + CRM setup</li>
+          <li>Automated SMS & email follow-up</li>
+          <li>Sales pipeline setup</li>
+          <li>Monthly strategy call</li>
+          <li>GHL sub-account included</li>
+        </ul>
+        <button class="btn-primary" style="width:100%;margin-top:28px;" onclick="showPage('contact')">Get Started</button>
+      </div>
+
+      <div class="pricing-card popular" onmousemove="cardMouse(this,event)">
+        <div class="pop-badge">Most Popular</div>
+        <div class="pc-name">Growth</div>
+        <div class="pc-desc">For established businesses ready to automate follow-up, build their reputation, and grow consistently.</div>
+        <div class="pc-price"><sub>$</sub>397</div>
+        <div class="pc-period">per month</div>
+        <div style="font-size:12px;margin-bottom:28px;margin-top:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 12px;display:inline-block;color:rgba(255,255,255,0.8);">+ $99 one-time setup fee</div>
+        <div class="pc-divider"></div>
+        <ul class="pc-features">
+          <li>Full website up to 7 pages</li>
+          <li>Advanced workflow automations</li>
+          <li>Email marketing campaigns</li>
+          <li>Google review automation</li>
+          <li>Reputation management</li>
+          <li>Bi-weekly strategy calls</li>
+        </ul>
+        <button class="btn-primary" style="width:100%;margin-top:28px;" onclick="showPage('contact')">Get Started</button>
+      </div>
+
+      <div class="pricing-card" onmousemove="cardMouse(this,event)">
+        <div class="pc-name">Scale</div>
+        <div class="pc-desc">Complete AI deployment. Your business captures leads, responds, and books appointments around the clock.</div>
+        <div class="pc-price"><sub>$</sub>997</div>
+        <div class="pc-period">per month</div>
+        <div style="font-size:12px;margin-bottom:28px;margin-top:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.4);border-radius:6px;padding:6px 12px;display:inline-block;"><span style="text-decoration:line-through;color:rgba(255,255,255,0.4);">$99 setup fee</span> <span style="color:#8B5CF6;font-weight:700;">✓ Included Free</span></div>
+        <div class="pc-divider"></div>
+        <ul class="pc-features">
+          <li>AI phone agent answers 24/7</li>
+          <li>Live chat AI on your website</li>
+          <li>Make.com integrations</li>
+          <li>Full custom CRM buildout</li>
+          <li>Weekly dedicated strategy calls</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="btn-primary" style="width:100%;margin-top:28px;" onclick="showPage('contact')">Get Started</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- What's included in every package -->
+  <section style="background:rgba(16,13,30,0.92);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="section-eyebrow">Every Package Includes</div>
+    <div class="section-title">The foundation every<br>business deserves</div>
+    <div class="values-grid" style="margin-top:48px;">
+      <div class="value-item">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#8B5CF6" stroke-width="1.8"/><path d="M7 10l2 2 4-4" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="value-title">24/7 Lead Capture</div>
+        <div class="value-desc">Every inquiry captured automatically — forms, chat, and calls all pipe directly into your CRM around the clock.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4h12v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" stroke="#8B5CF6" stroke-width="1.8"/><path d="M4 8h12M8 4v4" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="value-title">Instant Follow-Up</div>
+        <div class="value-desc">Leads receive a personal text or email within seconds of reaching out — before they can call a competitor.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="13" rx="2" stroke="#8B5CF6" stroke-width="1.8"/><path d="M2 8h16M6 2v2M14 2v2" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="value-title">Visual Sales Pipeline</div>
+        <div class="value-desc">See every lead's status at a glance. Know who to call, what to send, and when — always organized and clear.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4h12v9a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" stroke="#8B5CF6" stroke-width="1.8"/><path d="M4 8h12" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/><path d="M8 12h4" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="value-title">Review Automation</div>
+        <div class="value-desc">After every transaction we automatically ask customers for a review — making it effortless to build your online reputation over time.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-bg"></div>
+    <div class="section-title" style="text-align:center;max-width:500px;margin:0 auto 16px;">Not sure which plan is right?</div>
+    <div class="section-sub" style="text-align:center;margin:0 auto 40px;">Book a free call and we'll recommend the best fit for your business.</div>
+    <button class="btn-primary" onclick="showPage('contact')">Book Free Discovery Call</button>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <svg height="28" viewBox="0 0 200 88" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="flg" x1="0" y1="0" x2="200" y2="88" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#DDD6FE"/><stop offset="50%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#6D28D9"/></linearGradient></defs><g transform="translate(0,6) scale(0.38)"><path d="M5 4 L54 4 L54 70 L40 70 L40 84 L5 84 Z" stroke="url(#flg)" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M40 70 Q52 73 55 80 Q57 86 40 84" stroke="#A78BFA" stroke-width="2" fill="none" stroke-linecap="round"/><line x1="12" y1="22" x2="47" y2="22" stroke="rgba(196,181,253,0.3)" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="33" x2="47" y2="33" stroke="rgba(196,181,253,0.2)" stroke-width="1.5" stroke-linecap="round"/></g><text x="26" y="38" font-family="Bebas Neue,sans-serif" font-size="36" fill="white" letter-spacing="2">NEXT</text><text x="26" y="72" font-family="Bebas Neue,sans-serif" font-size="36" fill="url(#flg)" letter-spacing="2">CHAPTER</text></svg>
+      <div>
+        <div class="footer-name">Next Chapter Automation</div>
+        <div class="footer-sub">(715) 587-6649</div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('services')">Services</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+      <div>© 2025 Next Chapter Automation LLC</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════
+     ABOUT PAGE
+════════════════════════════════════════ -->
+<div class="page" id="about">
+
+  <section style="padding-top:140px;">
+    <div class="section-eyebrow">Our Story</div>
+    <div class="section-title">Built by neighbors,<br>powered by AI</div>
+    <div class="section-sub">We started Next Chapter Automation because we believe every small business deserves the same powerful tools that Fortune 500 companies use — without the enterprise price tag or the complexity.</div>
+
+    <div class="proof-strip fade-up" style="margin-top:56px;">
+      <div>
+        <div class="section-eyebrow">Our Mission</div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1.3;margin-bottom:16px;">Level the playing field for small business</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.7;">We got tired of seeing great local businesses lose leads simply because they couldn't respond fast enough, follow up consistently enough, or show up online professionally enough. So we built the solution — and now we deploy it for businesses across the country.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="background:rgba(139,92,246,0.08);border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--p);">$197</div>
+          <div style="font-size:13px;color:var(--muted);">Starting monthly investment — less than one lost lead</div>
+        </div>
+        <div style="background:rgba(139,92,246,0.08);border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--p);">24/7</div>
+          <div style="font-size:13px;color:var(--muted);">Your system works even when you're off the clock</div>
+        </div>
+        <div style="background:rgba(139,92,246,0.08);border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--p);">100%</div>
+          <div style="font-size:13px;color:var(--muted);">Done-for-you — we build and manage everything</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Founders -->
+  <section style="background:rgba(16,13,30,0.92);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="section-eyebrow">The Team</div>
+    <div class="section-title">Meet the founders</div>
+    <div class="founders-grid">
+      <div class="founder-card" onmousemove="cardMouse(this,event)">
+        <div class="founder-img-area">
+          <img src="https://assets.cdn.filesafe.space/wsLyw04B1xFAU9ZagAnB/media/69d2fbf9a7dcb4cff0c487f6.png" alt="Benjamin Markowski" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="founder-img-placeholder" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">BM</div>
+        </div>
+        <div class="founder-body">
+          <div class="founder-name">Benjamin Markowski</div>
+          <div class="founder-role">Co-Founder & CEO</div>
+          <div class="founder-bio">Ben brings years of automotive industry experience and a no-nonsense approach to business. He leads client relationships, strategy, and sales — and is the driving force behind MB Auto, our proof-of-concept dealership in Princeton, MN. If you've got a question, Ben's got a straight answer.</div>
+          <div style="margin-top:16px;font-size:13px;color:var(--p);">(715) 587-6649</div>
+        </div>
+      </div>
+      <div class="founder-card" onmousemove="cardMouse(this,event)">
+        <div class="founder-img-area">
+          <img src="https://assets.cdn.filesafe.space/wsLyw04B1xFAU9ZagAnB/media/69d2fc3aa7dcb4cff0c49237.jpg" alt="Miguel Eulloque Montero" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="founder-img-placeholder" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">ME</div>
+        </div>
+        <div class="founder-body">
+          <div class="founder-name">Miguel Eulloque Montero</div>
+          <div class="founder-role">Co-Founder & COO</div>
+          <div class="founder-bio">Miguel is the architect behind every automation system we build. Detail-oriented and technically sharp, he handles client onboarding, workflow builds, and makes sure every system runs exactly the way it should. When something needs to work perfectly, Miguel makes it happen.</div>
+          <div style="margin-top:16px;font-size:13px;color:var(--p);">(651) 313-4905</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section>
+    <div class="section-eyebrow">What We Stand For</div>
+    <div class="section-title">Our values</div>
+    <div class="values-grid">
+      <div class="value-item fade-up">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2 5h5l-4 3 1.5 5L10 12.5 5.5 15 7 10 3 7h5z" stroke="#8B5CF6" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="value-title">Radical Transparency</div>
+        <div class="value-desc">No hidden fees, no confusing contracts, no bait-and-switch. You always know exactly what you're getting and what it costs.</div>
+      </div>
+      <div class="value-item fade-up" style="transition-delay:0.1s">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#8B5CF6" stroke-width="1.8"/><path d="M7 10l2 2 4-4" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="value-title">Real Results</div>
+        <div class="value-desc">We measure success by your leads captured and revenue generated — not vanity metrics. If it doesn't make you money, we fix it.</div>
+      </div>
+      <div class="value-item fade-up" style="transition-delay:0.2s">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2C7 2 4 5 4 8c0 5 6 10 6 10s6-5 6-10c0-3-3-6-6-6z" stroke="#8B5CF6" stroke-width="1.8"/><circle cx="10" cy="8" r="2" stroke="#8B5CF6" stroke-width="1.8"/></svg>
+        </div>
+        <div class="value-title">Community First</div>
+        <div class="value-desc">We're rooted in small-town Minnesota. We care about local business because these are our neighbors and our community.</div>
+      </div>
+      <div class="value-item fade-up" style="transition-delay:0.3s">
+        <div class="value-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10h14M10 3l7 7-7 7" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="value-title">Always Moving Forward</div>
+        <div class="value-desc">AI is evolving fast. We stay ahead of the curve so our clients always have access to the best tools available.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-bg"></div>
+    <div class="section-title" style="text-align:center;max-width:500px;margin:0 auto 16px;">Want to work with us?</div>
+    <div class="section-sub" style="text-align:center;margin:0 auto 40px;">Let's have a quick call and see if we're a good fit.</div>
+    <button class="btn-primary" onclick="showPage('contact')">Book Free Discovery Call</button>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <svg height="28" viewBox="0 0 200 88" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="flg" x1="0" y1="0" x2="200" y2="88" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#DDD6FE"/><stop offset="50%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#6D28D9"/></linearGradient></defs><g transform="translate(0,6) scale(0.38)"><path d="M5 4 L54 4 L54 70 L40 70 L40 84 L5 84 Z" stroke="url(#flg)" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M40 70 Q52 73 55 80 Q57 86 40 84" stroke="#A78BFA" stroke-width="2" fill="none" stroke-linecap="round"/><line x1="12" y1="22" x2="47" y2="22" stroke="rgba(196,181,253,0.3)" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="33" x2="47" y2="33" stroke="rgba(196,181,253,0.2)" stroke-width="1.5" stroke-linecap="round"/></g><text x="26" y="38" font-family="Bebas Neue,sans-serif" font-size="36" fill="white" letter-spacing="2">NEXT</text><text x="26" y="72" font-family="Bebas Neue,sans-serif" font-size="36" fill="url(#flg)" letter-spacing="2">CHAPTER</text></svg>
+      <div>
+        <div class="footer-name">Next Chapter Automation</div>
+        <div class="footer-sub">(715) 587-6649</div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('services')">Services</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+      <div>© 2025 Next Chapter Automation LLC</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════
+     CONTACT PAGE
+════════════════════════════════════════ -->
+<div class="page" id="contact">
+
+  <section style="padding-top:140px;">
+    <div class="section-eyebrow">Let's Talk</div>
+    <div class="section-title">Book your free<br>discovery call</div>
+    <div class="section-sub">30 minutes. No pressure. We'll show you exactly what your business needs and what it would cost.</div>
+
+    <div class="contact-grid" style="margin-top:56px;">
+      <div class="contact-info">
+        <div class="contact-info-card">
+          <div class="ci-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4C4 4 3 4 3 5C3 6 3 9 6 12C9 15 12 15 13 15C14 15 14 14 14 14L15.5 12.5L13.5 10.5L12.5 11.5C11 10 10 9 10 9L11 8L9 6L7.5 7.5C6 5.5 5 4 4 4Z" fill="#8B5CF6"/></svg>
+          </div>
+          <div>
+            <div class="ci-label">Phone — Ben</div>
+            <div class="ci-value">(715) 587-6649</div>
+            <div class="ci-sub">Call or text anytime</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="ci-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4C4 4 3 4 3 5C3 6 3 9 6 12C9 15 12 15 13 15C14 15 14 14 14 14L15.5 12.5L13.5 10.5L12.5 11.5C11 10 10 9 10 9L11 8L9 6L7.5 7.5C6 5.5 5 4 4 4Z" fill="#8B5CF6"/></svg>
+          </div>
+          <div>
+            <div class="ci-label">Phone — Miguel</div>
+            <div class="ci-value">(651) 313-4905</div>
+            <div class="ci-sub">Call or text anytime</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="ci-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="#8B5CF6" stroke-width="1.8"/><path d="M3 8l7 4 7-4" stroke="#8B5CF6" stroke-width="1.8"/></svg>
+          </div>
+          <div>
+            <div class="ci-label">Email</div>
+            <div class="ci-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0a63646c654a646f727e69626b7a7e6f786b7f7e65676b7e63656424696567">[email&#160;protected]</a></div>
+            <div class="ci-sub">We reply within the hour</div>
+          </div>
+        </div>
+
+
+        <!-- Quick stats -->
+        <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(109,40,217,0.12));border:1px solid var(--border);border-radius:14px;padding:24px;">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px;">What happens on the call?</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--p);">→</span> We learn about your business and goals</div>
+            <div style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--p);">→</span> We identify your biggest lead capture gaps</div>
+            <div style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--p);">→</span> We recommend the right package for you</div>
+            <div style="font-size:13px;color:var(--muted);display:flex;gap:8px;"><span style="color:var(--p);">→</span> No pressure — you decide if it's a fit</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form">
+        <div class="form-title">Send us a message</div>
+        <div class="form-sub">Fill this out and we'll reach out within the hour.</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input class="form-input" type="text" placeholder="Benjamin">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input class="form-input" type="text" placeholder="Markowski">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" type="tel" placeholder="(715) 587-6649">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" placeholder="you@business.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Business Type</label>
+          <select class="form-select">
+            <option>Select your industry...</option>
+            <option>Auto Dealership</option>
+            <option>Restaurant / Cafe</option>
+            <option>Real Estate</option>
+            <option>Contractor / Trades</option>
+            <option>Salon / Spa</option>
+            <option>Healthcare</option>
+            <option>Retail</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">I'm interested in...</label>
+          <select class="form-select">
+            <option>Choose a package...</option>
+            <option>Starter — $197/mo</option>
+            <option>Growth — $397/mo</option>
+            <option>Scale — $997/mo</option>
+            <option>Not sure — need a recommendation</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message (optional)</label>
+          <textarea class="form-textarea" placeholder="Tell us a bit about your business and what you're looking to improve..."></textarea>
+        </div>
+        <button class="form-submit">Send Message — We'll Reply Fast</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <svg height="28" viewBox="0 0 200 88" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="flg" x1="0" y1="0" x2="200" y2="88" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#DDD6FE"/><stop offset="50%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#6D28D9"/></linearGradient></defs><g transform="translate(0,6) scale(0.38)"><path d="M5 4 L54 4 L54 70 L40 70 L40 84 L5 84 Z" stroke="url(#flg)" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M40 70 Q52 73 55 80 Q57 86 40 84" stroke="#A78BFA" stroke-width="2" fill="none" stroke-linecap="round"/><line x1="12" y1="22" x2="47" y2="22" stroke="rgba(196,181,253,0.3)" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="33" x2="47" y2="33" stroke="rgba(196,181,253,0.2)" stroke-width="1.5" stroke-linecap="round"/></g><text x="26" y="38" font-family="Bebas Neue,sans-serif" font-size="36" fill="white" letter-spacing="2">NEXT</text><text x="26" y="72" font-family="Bebas Neue,sans-serif" font-size="36" fill="url(#flg)" letter-spacing="2">CHAPTER</text></svg>
+      <div>
+        <div class="footer-name">Next Chapter Automation</div>
+        <div class="footer-sub">nextchapterautomation@gmail.com</div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div class="footer-links">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('services')">Services</a>
+        <a href="#" onclick="showPage('about')">About</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+      </div>
+      <div>© 2025 Next Chapter Automation LLC · All rights reserved</div>
+    </div>
+  </footer>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── PAGE NAVIGATION ──
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.remove('active');
+    p.style.display='none';
+  });
+  const page = document.getElementById(id);
+  page.style.display='block';
+  setTimeout(()=>page.classList.add('active'),10);
+  window.scrollTo({top:0,behavior:'smooth'});
+  observeFadeUps();
+}
+
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=(mx-6)+'px';
+  cursor.style.top=(my-6)+'px';
+  cursor.style.opacity='1';
+  ring.style.opacity='1';
+});
+
+function animRing(){
+  rx+=(mx-rx)*0.12;
+  ry+=(my-ry)*0.12;
+  ring.style.left=(rx-18)+'px';
+  ring.style.top=(ry-18)+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('button,a,.service-card,.pricing-card,.founder-card,.target-pill,.value-item,.contact-info-card,.stat-item,.process-step').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.transform='scale(1.8)';
+    ring.style.width='56px';ring.style.height='56px';
+    ring.style.borderColor='rgba(139,92,246,0.8)';
+    ring.style.marginLeft='-10px';ring.style.marginTop='-10px';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.transform='scale(1)';
+    ring.style.width='36px';ring.style.height='36px';
+    ring.style.borderColor='rgba(139,92,246,0.5)';
+    ring.style.marginLeft='0';ring.style.marginTop='0';
+  });
+});
+
+// ── CARD MOUSE GLOW ──
+function cardMouse(el,e){
+  const r=el.getBoundingClientRect();
+  const x=((e.clientX-r.left)/r.width*100).toFixed(1);
+  const y=((e.clientY-r.top)/r.height*100).toFixed(1);
+  el.style.setProperty('--mx',x+'%');
+  el.style.setProperty('--my',y+'%');
+}
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>20);
+});
+
+// ── PARTICLES ──
+const canvas=document.getElementById('particle-canvas');
+const ctx=canvas.getContext('2d');
+let particles=[];
+let W2,H2;
+
+function resize(){
+  W2=canvas.width=window.innerWidth;
+  H2=canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+
+class Particle{
+  constructor(){this.reset();}
+  reset(){
+    this.x=Math.random()*W2;
+    this.y=Math.random()*H2;
+    this.vx=(Math.random()-0.5)*0.3;
+    this.vy=(Math.random()-0.5)*0.3;
+    this.size=Math.random()*1.5+0.5;
+    this.opacity=Math.random()*0.5+0.1;
+    this.life=Math.random()*200+100;
+    this.maxLife=this.life;
+  }
+  update(){
+    this.x+=this.vx;this.y+=this.vy;
+    this.life--;
+    if(this.life<=0||this.x<0||this.x>W2||this.y<0||this.y>H2)this.reset();
+    // Mouse attraction
+    const dx=mx-this.x,dy=my-this.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<150){
+      this.vx+=dx/dist*0.02;
+      this.vy+=dy/dist*0.02;
+    }
+    // Damping
+    this.vx*=0.99;this.vy*=0.99;
+  }
+  draw(){
+    const alpha=this.opacity*(this.life/this.maxLife);
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle=`rgba(139,92,246,${alpha})`;
+    ctx.fill();
+  }
+}
+
+for(let i=0;i<120;i++)particles.push(new Particle());
+
+// Connect nearby particles
+function drawConnections(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        const alpha=(1-dist/100)*0.15;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(139,92,246,${alpha})`;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animParticles(){
+  ctx.clearRect(0,0,W2,H2);
+  particles.forEach(p=>{p.update();p.draw();});
+  drawConnections();
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+// ── SCROLL REVEAL ──
+function observeFadeUps(){
+  const els=document.querySelectorAll('.fade-up');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+  },{threshold:0.15});
+  els.forEach(el=>obs.observe(el));
+}
+observeFadeUps();
+</script>
+</body>
+</html>
