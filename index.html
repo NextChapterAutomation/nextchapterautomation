@@ -48,6 +48,7 @@ nav.scrolled{background:rgba(12,10,20,0.95);}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:48px;font-weight:400;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;}
 .stat-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:0.5px;}
 section{padding:100px 5%;position:relative;background:transparent;}
+.pricing-card{min-width:0;word-wrap:break-word;}
 .section-eyebrow{font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5vw,72px);font-weight:400;line-height:1.0;letter-spacing:2px;margin-bottom:16px;}
 .section-sub{font-size:16px;color:var(--muted);max-width:520px;line-height:1.7;font-weight:300;}
@@ -173,7 +174,7 @@ footer{background:var(--dark2);border-top:1px solid var(--border);padding:40px 5
 .faq-item:hover{border-color:var(--p);}
 .faq-q{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;}
 .faq-a{font-size:13.5px;color:var(--muted);line-height:1.7;}
-@media(max-width:800px){.pricing-grid{grid-template-columns:1fr;}.addons-grid{grid-template-columns:1fr;}.sd-grid{grid-template-columns:1fr;}}
+@media(max-width:800px){.pricing-grid{grid-template-columns:1fr;}.addons-grid{grid-template-columns:1fr;}.sd-grid{grid-template-columns:1fr;}.pricing-card{min-width:0;}.faq-grid{grid-template-columns:1fr;}}
 @media(max-width:768px){.nav-links{display:none;}.stats-strip{grid-template-columns:repeat(2,1fr);}.process-steps{grid-template-columns:repeat(2,1fr);}.process-steps::before{display:none;}.founders-grid,.contact-grid,.proof-strip{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.values-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -301,7 +302,7 @@ footer{background:var(--dark2);border-top:1px solid var(--border);padding:40px 5
   <section>
     <div class="section-eyebrow">Common Questions</div>
     <div class="section-title">Quick answers</div>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-top:40px;max-width:720px;">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:40px;max-width:720px;width:100%;">
       <div class="faq-item"><div class="faq-q">Is there a contract?</div><div class="faq-a">No long-term contracts. We have a 3-month minimum so we have time to deliver real results — after that it's month-to-month with 30 days notice to cancel.</div></div>
       <div class="faq-item"><div class="faq-q">Do you build everything for me?</div><div class="faq-a">Yes — 100% done for you. We build your website, set up your CRM, build your automations, and manage everything. No technical knowledge needed.</div></div>
       <div class="faq-item"><div class="faq-q">How long does it take to get set up?</div><div class="faq-a">Most clients are fully live within 3-5 days of signing on. We move fast because every day without automation is leads slipping through the cracks.</div></div>
@@ -683,54 +684,64 @@ footer{background:var(--dark2);border-top:1px solid var(--border);padding:40px 5
     <div class="section-title">Frequently asked<br>questions</div>
     <div class="section-sub">Everything you need to know before getting started.</div>
 
-    <div style="display:flex;flex-direction:column;gap:32px;margin-top:56px;max-width:760px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:56px;width:100%;">
 
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">Pricing & Commitment</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="faq-item"><div class="faq-q">How much does it cost?</div><div class="faq-a">We have three main packages — Starter at $197/mo, Growth at $397/mo, and Scale at $997/mo. All plans have a one-time setup fee of $99 except Scale which includes setup free. We also offer SalesDriver at $97/mo specifically for car salespeople. Add-ons are available on top of any plan starting at $25/mo.</div></div>
-          <div class="faq-item"><div class="faq-q">Is there a contract?</div><div class="faq-a">No long-term contracts. We have a 3-month minimum commitment so we have enough time to build your system and deliver real results. After that it's month-to-month and you can cancel with 30 days written notice.</div></div>
-          <div class="faq-item"><div class="faq-q">What is the setup fee for?</div><div class="faq-a">The one-time setup fee covers account configuration, building your website, deploying your CRM, building your initial workflows, and your onboarding call. It's the cost of our time to get everything built and live for you.</div></div>
-          <div class="faq-item"><div class="faq-q">Can I upgrade my plan later?</div><div class="faq-a">Absolutely — you can upgrade anytime. A lot of clients start on Starter to get the foundation built and move to Growth or Scale as their business grows. We handle the upgrade seamlessly with no interruption to your system.</div></div>
+      <!-- LEFT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:28px;">
+
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">Pricing & Commitment</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="faq-item"><div class="faq-q">How much does it cost?</div><div class="faq-a">We have three main packages — Starter at $197/mo, Growth at $397/mo, and Scale at $997/mo. All plans have a one-time setup fee of $99 except Scale which includes setup free. We also offer SalesDriver at $97/mo specifically for car salespeople. Add-ons are available on top of any plan starting at $25/mo.</div></div>
+            <div class="faq-item"><div class="faq-q">Is there a contract?</div><div class="faq-a">No long-term contracts. We have a 3-month minimum commitment so we have enough time to build your system and deliver real results. After that it's month-to-month and you can cancel with 30 days written notice.</div></div>
+            <div class="faq-item"><div class="faq-q">What is the setup fee for?</div><div class="faq-a">The one-time setup fee covers account configuration, building your website, deploying your CRM, building your initial workflows, and your onboarding call. It's the cost of our time to get everything built and live for you.</div></div>
+            <div class="faq-item"><div class="faq-q">Can I upgrade my plan later?</div><div class="faq-a">Absolutely — you can upgrade anytime. A lot of clients start on Starter to get the foundation built and move to Growth or Scale as their business grows. We handle the upgrade seamlessly with no interruption to your system.</div></div>
+          </div>
         </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">How It Works</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="faq-item"><div class="faq-q">How long does it take to get set up?</div><div class="faq-a">Most clients are fully live within 3-5 days of signing on. We move fast because every day without automation is leads slipping through the cracks. You'll have a working system within the first week.</div></div>
+            <div class="faq-item"><div class="faq-q">Do I need any technical knowledge?</div><div class="faq-a">None at all. We build and manage everything on the technical side. Your day-to-day is three simple things — check your conversations, update your pipeline stages, and show up for booked calls. That's it.</div></div>
+            <div class="faq-item"><div class="faq-q">Will this work for my type of business?</div><div class="faq-a">If your business gets leads, takes appointments, or has customers who could refer others — yes. We work with contractors, restaurants, salons, real estate agents, auto dealers, healthcare clinics, law offices, fitness studios, retailers, and more. If you're not sure, book a free call and we'll tell you honestly.</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">SalesDriver — Car Sales</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="faq-item"><div class="faq-q">Does my dealership need to approve this?</div><div class="faq-a">No. SalesDriver is your personal system — completely separate from the dealership's tools. You sign up as an individual, it runs on your phone, and your dealership never needs to be involved.</div></div>
+            <div class="faq-item"><div class="faq-q">Will this interfere with the dealership's CRM?</div><div class="faq-a">Not at all. SalesDriver runs independently alongside whatever CRM your dealership uses. Think of it as your own personal layer on top — your contacts, your follow-ups, your pipeline.</div></div>
+            <div class="faq-item"><div class="faq-q">What if I switch dealerships?</div><div class="faq-a">Your contacts and your system come with you. Since SalesDriver is tied to you personally — not the dealership — everything moves when you move. Your book of business stays yours.</div></div>
+          </div>
+        </div>
+
       </div>
 
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">What You Get</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="faq-item"><div class="faq-q">Do you build everything for me?</div><div class="faq-a">Yes — 100% done for you. We build your website, configure your CRM, set up your pipelines, build your automation workflows, and manage everything. Your job is to show up for booked calls and respond to hot leads. We handle the rest.</div></div>
-          <div class="faq-item"><div class="faq-q">What exactly is included in my package?</div><div class="faq-a">Every package includes a custom website with lead capture form, automated SMS and email follow-up, a sales pipeline, and a booking calendar. Higher tiers add email marketing, reputation management, AI phone agents, and more. See the full breakdown on our Services page.</div></div>
-          <div class="faq-item"><div class="faq-q">What is a workflow or automation?</div><div class="faq-a">A workflow is a set of automatic actions that run on their own when something happens — no manual effort needed. For example: a new lead fills out your form → they get a text within seconds → if they don't respond, a follow-up fires 24 hours later. You set it up once and it runs forever.</div></div>
-          <div class="faq-item"><div class="faq-q">What is a sales pipeline?</div><div class="faq-a">A sales pipeline is a visual board showing every lead and exactly where they are in your sales process — New Lead, Contacted, Demo Scheduled, Proposal Sent, Closed. You always know who to follow up with and nothing falls through the cracks.</div></div>
-        </div>
-      </div>
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:28px;">
 
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">How It Works</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="faq-item"><div class="faq-q">How long does it take to get set up?</div><div class="faq-a">Most clients are fully live within 3-5 days of signing on. We move fast because every day without automation is leads slipping through the cracks. You'll have a working system within the first week.</div></div>
-          <div class="faq-item"><div class="faq-q">Do I need any technical knowledge?</div><div class="faq-a">None at all. We build and manage everything on the technical side. Your day-to-day is three simple things — check your conversations, update your pipeline stages, and show up for booked calls. That's it.</div></div>
-          <div class="faq-item"><div class="faq-q">Will this work for my type of business?</div><div class="faq-a">If your business gets leads, takes appointments, or has customers who could refer others — yes. We work with contractors, restaurants, salons, real estate agents, auto dealers, healthcare clinics, law offices, fitness studios, retailers, and more. If you're not sure, book a free call and we'll tell you honestly.</div></div>
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">What You Get</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="faq-item"><div class="faq-q">Do you build everything for me?</div><div class="faq-a">Yes — 100% done for you. We build your website, configure your CRM, set up your pipelines, build your automation workflows, and manage everything. Your job is to show up for booked calls and respond to hot leads. We handle the rest.</div></div>
+            <div class="faq-item"><div class="faq-q">What exactly is included in my package?</div><div class="faq-a">Every package includes a custom website with lead capture form, automated SMS and email follow-up, a sales pipeline, and a booking calendar. Higher tiers add email marketing, reputation management, AI phone agents, and more. See the full breakdown on our Services page.</div></div>
+            <div class="faq-item"><div class="faq-q">What is a workflow or automation?</div><div class="faq-a">A workflow is a set of automatic actions that run on their own when something happens — no manual effort needed. For example: a new lead fills out your form → they get a text within seconds → if they don't respond, a follow-up fires 24 hours later. You set it up once and it runs forever.</div></div>
+            <div class="faq-item"><div class="faq-q">What is a sales pipeline?</div><div class="faq-a">A sales pipeline is a visual board showing every lead and exactly where they are in your sales process — New Lead, Contacted, Demo Scheduled, Proposal Sent, Closed. You always know who to follow up with and nothing falls through the cracks.</div></div>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">Results & Support</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="faq-item"><div class="faq-q">How soon will I see results?</div><div class="faq-a">Most clients see their first automated lead follow-ups firing within the first week. Meaningful business results — more booked calls, fewer missed leads, improved response time — typically show within the first 30 days. We don't promise overnight miracles but we do promise a system that works from day one.</div></div>
-          <div class="faq-item"><div class="faq-q">What kind of support do I get?</div><div class="faq-a">Every plan includes regular check-in calls — monthly on Starter, bi-weekly on Growth and Scale. You also get email support, and Scale clients get priority access to us via phone and chat. We're a small team and we actually pick up the phone.</div></div>
-          <div class="faq-item"><div class="faq-q">What happens if something breaks?</div><div class="faq-a">We monitor your system and fix issues proactively. If something breaks we'll often know before you do and have it resolved the same day. You're not on your own — we're managing the system alongside you.</div></div>
-          <div class="faq-item"><div class="faq-q">Can I cancel?</div><div class="faq-a">Yes — after the 3-month minimum you can cancel anytime with 30 days written notice. Your data is available for export for 30 days after cancellation. Setup fees are non-refundable as they cover work already completed.</div></div>
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">Results & Support</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="faq-item"><div class="faq-q">How soon will I see results?</div><div class="faq-a">Most clients see their first automated lead follow-ups firing within the first week. Meaningful business results — more booked calls, fewer missed leads, improved response time — typically show within the first 30 days. We don't promise overnight miracles but we do promise a system that works from day one.</div></div>
+            <div class="faq-item"><div class="faq-q">What kind of support do I get?</div><div class="faq-a">Every plan includes regular check-in calls — monthly on Starter, bi-weekly on Growth and Scale. You also get email support, and Scale clients get priority access to us via phone and chat. We're a small team and we actually pick up the phone.</div></div>
+            <div class="faq-item"><div class="faq-q">What happens if something breaks?</div><div class="faq-a">We monitor your system and fix issues proactively. If something breaks we'll often know before you do and have it resolved the same day. You're not on your own — we're managing the system alongside you.</div></div>
+            <div class="faq-item"><div class="faq-q">Can I cancel?</div><div class="faq-a">Yes — after the 3-month minimum you can cancel anytime with 30 days written notice. Your data is available for export for 30 days after cancellation. Setup fees are non-refundable as they cover work already completed.</div></div>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--p);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);">SalesDriver — Car Sales</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="faq-item"><div class="faq-q">Does my dealership need to approve this?</div><div class="faq-a">No. SalesDriver is your personal system — completely separate from the dealership's tools. You sign up as an individual, it runs on your phone, and your dealership never needs to be involved.</div></div>
-          <div class="faq-item"><div class="faq-q">Will this interfere with the dealership's CRM?</div><div class="faq-a">Not at all. SalesDriver runs independently alongside whatever CRM your dealership uses. Think of it as your own personal layer on top — your contacts, your follow-ups, your pipeline.</div></div>
-          <div class="faq-item"><div class="faq-q">What if I switch dealerships?</div><div class="faq-a">Your contacts and your system come with you. Since SalesDriver is tied to you personally — not the dealership — everything moves when you move. Your book of business stays yours.</div></div>
-        </div>
       </div>
 
     </div>
@@ -839,7 +850,7 @@ footer{background:var(--dark2);border-top:1px solid var(--border);padding:40px 5
         <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px;">Send us a message</div>
         <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">Fill this out and we'll reach out within the hour.</div>
         <div style="background:rgba(16,13,30,0.97);border:1px solid rgba(139,92,246,0.35);border-radius:16px;overflow:hidden;box-shadow:0 0 40px rgba(139,92,246,0.12);padding:8px;">
-          <iframe src="https://api.leadconnectorhq.com/widget/form/j9BMJobBYAovvQMvWNGh" style="width:100%;height:804px;border:none;border-radius:12px;color-scheme:dark;filter:invert(1) hue-rotate(180deg);" id="inline-j9BMJobBYAovvQMvWNGh" data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-trigger-value="" data-activation-type="alwaysActivated" data-activation-value="" data-deactivation-type="neverDeactivate" data-deactivation-value="" data-form-name="NCA Lead Form" data-height="804" data-layout-iframe-id="inline-j9BMJobBYAovvQMvWNGh" data-form-id="j9BMJobBYAovvQMvWNGh" title="NCA Lead Form"></iframe>
+          <iframe src="https://api.leadconnectorhq.com/widget/form/j9BMJobBYAovvQMvWNGh" style="width:100%;height:804px;border:none;border-radius:12px;filter:invert(0.88) hue-rotate(180deg) brightness(0.95);" id="inline-j9BMJobBYAovvQMvWNGh" data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-trigger-value="" data-activation-type="alwaysActivated" data-activation-value="" data-deactivation-type="neverDeactivate" data-deactivation-value="" data-form-name="NCA Lead Form" data-height="804" data-layout-iframe-id="inline-j9BMJobBYAovvQMvWNGh" data-form-id="j9BMJobBYAovvQMvWNGh" title="NCA Lead Form"></iframe>
           <script src="https://link.msgsndr.com/js/form_embed.js"></script>
         </div>
       </div>
